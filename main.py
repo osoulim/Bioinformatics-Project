@@ -85,46 +85,19 @@ def find_lcs(tree, k):
 	return str(max_node[0]), res
 
 
+def find_palindrom(text):
+	tree = generate_tree([text, text[::-1]])
+	tree.prepare_lca()
+	all_paths = tree.root.get_positions()
+	string_paths = [x[1] for x in all_paths if x[0] == 0]
+	reverse_paths = [x[1] for x in all_paths if x[0] == 1]
+	string_paths.sort(key=lambda x: x.k)
+	reverse_paths.sort(key=lambda x: x.k)
+	for path in string_paths:
+		print(path, ",", path.k)
+	for path in reverse_paths:
+		print(path, ",", path.k)
+	
 
-
-
-# for child in tree.root.children:
-# 	print(tree.root.children[child].C)
-
-
-
-
-# line1 = input()
-# k = int(input())
-
-# my_tree = Tree({'A' :line1 })
-# compute_leaf_number(my_tree.root)
-# max_node = [my_tree.root,0]
-# compute_k_repeat(my_tree.root,0,k )
-# print(max_node[0])
-
-
-
-# if __name__ == "__main__":
-# 	arg = sys.argv()
-# 	if(arg[0] == "task1"):
-# 		print(is_in_tree(arg[1],arg[2]))
-# 	if(arg[0] == "task2"):
-# 		my_tree = Tree({'A' : arg[1]})
-# 		compute_leaf_number(my_tree.root)
-# 		max_node = [tree.root, 0]
-# 		compute_k_repeat(tree.root,0,arg[2])
-# 		print(max_node[0])
-# 	if(arg[0] == "task3"):
-# 		trees = {}
-# 		for i in range(1, len(arg)):
-# 			trees.update({i:arg[i]})
-# 		my_tree(tress)	
-# 		compute_leaf_number(my_tree.root)
-# 		max_node = [tree.root, 0]
-# 		compute_k_repeat_genral(tree.root,0,arg[2])
-# 		print(max_node[0])
-# 	if(arg[0] == "task4"):
-# 		print("pal")
-
-
+if __name__ == "__main__":
+	find_palindrom("banana")
