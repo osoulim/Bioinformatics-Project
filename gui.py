@@ -120,7 +120,7 @@ def on_generate_button_click():
     if file_name:
         suffix_tree = generate_tree_from_file(file_name)
     else:
-        tmp = strings_text.toPlainText().strip().split("\n")
+        tmp = strings_text.toPlainText().strip().replace(">\n", "").split("\n")
         texts = [x for x in tmp if x != '']
         if len(texts) == 0:
             return QMessageBox.warning(window, "Error!", "Neither file or text not provided", QMessageBox.Ok, QMessageBox.Ok)
@@ -174,8 +174,11 @@ lcs_button.clicked.connect(on_lcs_button_click)
 
 #Palindrom button
 def on_palindrom_button_click():
-    global ans, positions
-    text = strings_text.toPlainText().strip().split("\n")[0]
+    global ans, positions, file_name
+    if file_name:
+        text = open(file_name).read().strip().replace(">\n", "").split("\n")[0]
+    else:
+        text = strings_text.toPlainText().strip().replace(">\n", "").split("\n")[0]
     ans, positions = find_palindrom(text)
     result_label.setText(str(ans) + "\n" + str(positions))
 
