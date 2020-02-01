@@ -1,9 +1,10 @@
 from PyQt5.QtWidgets import QApplication, QLabel, QWidget, QVBoxLayout, QHBoxLayout, QTextEdit, QLineEdit, QPushButton, QFileDialog, QStatusBar, QMessageBox
 from PyQt5.QtCore import Qt
-from main import generate_tree, generate_tree_from_file, find_all, find_repeats, find_lcs
+from main import generate_tree, generate_tree_from_file, find_all, find_repeats, find_lcs, find_palindrom
 
 app = QApplication([])
 window = QWidget()
+window.setWindowTitle("Bioinformatic Project")
 
 ### START UI
 # Buttons
@@ -13,12 +14,20 @@ query_button = QPushButton('Search')
 longest_button = QPushButton('Find Repeat')
 lcs_button = QPushButton('Find LCS')
 palindrom_button = QPushButton('Find Palindrom')
+save_button = QPushButton('Save ')
 
 # Text Edits
 strings_text = QTextEdit()
+strings_text.setPlaceholderText("Sequences Here")
+
 query_line = QLineEdit()
+query_line.setPlaceholderText("Query here")
+
 longest_line = QLineEdit()
+longest_line.setPlaceholderText("k number")
+
 lcs_line = QLineEdit()
+lcs_line.setPlaceholderText("k number")
 
 # Labels
 file_label = QLabel("Load_file")
@@ -47,7 +56,6 @@ lcs_layout.addWidget(lcs_button)
 palindrom_layout = QVBoxLayout()
 palindrom_layout.addWidget(palindrom_button)
 
-
 features_layout = QVBoxLayout()
 features_layout.addLayout(longest_layout)
 features_layout.addLayout(lcs_layout)
@@ -67,15 +75,20 @@ main_layout = QVBoxLayout()
 main_layout.addLayout(temp_layout)
 main_layout.addLayout(query_layout)
 
-result_label = QTextEdit("result")
+result_label = QTextEdit()
+result_label.setPlaceholderText("Result Will be here")
 result_label.setEnabled(False)
 result_label.setStyleSheet("color: black")
 result_label.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
 main_layout.addWidget(result_label)
 
+status_layout = QHBoxLayout()
 status_bar = QLabel("Ready")
 status_bar.setStyleSheet("color: blue")
-main_layout.addWidget(status_bar)
+status_layout.addWidget(status_bar)
+status_layout.addWidget(save_button)
+
+main_layout.addLayout(status_layout)
 
 window.setLayout(main_layout)
 window.show()
@@ -161,9 +174,26 @@ lcs_button.clicked.connect(on_lcs_button_click)
 
 #Palindrom button
 def on_palindrom_button_click():
-    pass
+    global ans, positions
+    text = strings_text.toPlainText().strip().split("\n")[0]
+    ans, positions = find_palindrom(text)
+    result_label.setText(str(ans) + "\n" + str(positions))
 
 palindrom_button.clicked.connect(on_palindrom_button_click)
 
+#Save button
+def on_save_button_click():
+    global ans, positions
+    options = QFileDialog.Options()
+    options |= QFileDialog.DontUseNativeDialog
+    fileName, _ = QFileDialog.getSaveFileName(window,"QFileDialog.getSaveFileName()","","Text Files (*.txt)", options=options)
+    if fileName and positions:
+        if not fileName[-4:] == '.txt':
+            fileName = fileName + ".txt"
+        handler = open(fileName, "w+")
+        handler.write(ans + "\n")
+        handler.write(str(positions))
+
+save_button.clicked.connect(on_save_button_click)
 
 app.exec_()

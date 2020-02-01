@@ -84,20 +84,61 @@ def find_lcs(tree, k):
 		res[tree_id].append(path.k)
 	return str(max_node[0]), res
 
+def odd_pal(neighbors,tree):
+	head = tree.root
+	for node_1, node_2 in neighbors:
+		lca_node = tree.lca(node_1,node_2)
+		if lca_node.string_depth() > head.string_depth():
+			head = lca_node
+	res = str(head)
+	res = (res[::-1])[:-1] + res
+	return res
+
+def even_pal(neighbors,tree):
+	if not len(neighbors):
+		return ""
+
+	head = None
+	mid = ""
+	for mid_char, node_2,node_3 in neighbors:
+		lca_node = tree.lca(node_2,node_3)
+		if head is None or  lca_node.string_depth() > head.string_depth():
+			head = lca_node
+			mid = mid_char
+
+	if(head == tree.root):
+		head = ""
+
+	res = str(head)
+	res = (res[::-1]) + (mid*2) + res
+	return res
+
+def get_pal_neighbor_leaves(tree, text):
+	n = len(text)
+	string_leaves = {}
+	reverse_leaves = {}
+	
+	def f(node):
+		if node.is_leaf():
+			if node.str_id == 0: string_leaves[node.path.start] = node
+			if node.str_id == 1: reverse_leaves[node.path.start] = node
+	tree.root.post_order(f)
+
+	odd_neighbors = [(string_leaves[i], reverse_leaves[n - i - 1]) for i in range(n)]
+	even_neighbors = [(text[i], string_leaves[i+1], reverse_leaves[n - i + 1]) for i in range(1, n - 1) if text[i] == text[i-1]]
+	return odd_neighbors, even_neighbors
+
 
 def find_palindrom(text):
 	tree = generate_tree([text, text[::-1]])
 	tree.prepare_lca()
-	all_paths = tree.root.get_positions()
-	string_paths = [x[1] for x in all_paths if x[0] == 0]
-	reverse_paths = [x[1] for x in all_paths if x[0] == 1]
-	string_paths.sort(key=lambda x: x.k)
-	reverse_paths.sort(key=lambda x: x.k)
-	for path in string_paths:
-		print(path, ",", path.k)
-	for path in reverse_paths:
-		print(path, ",", path.k)
+	odd_leaves, even_leaves = get_pal_neighbor_leaves(tree, text)
+	odd_pal_str = odd_pal(odd_leaves, tree)
+	even_pal_str = even_pal(even_leaves, tree)
+	ans = max(odd_pal_str, even_pal_str, key=len)
+	positions = find_all(tree, ans)[0]
+	return ans, positions
 	
-
 if __name__ == "__main__":
-	find_palindrom("banana")
+	ans = find_palindrom("abcggecba")
+	print(ans)
